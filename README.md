@@ -1,5 +1,5 @@
-# UN PROYECTO DE BASOS DE DATOS
-## SISTEMA DE ENERGÍA ELÉCTRICA
+#### SISTEMA DE ENERGÍA ELÉCTRICA
+Es un proyecto de basos de datos
 #### Hola, por este proyecto he hecho una sistema del energia electrica paso a paso
 #### Por favor subed el zip PRACTICA_ZEYNEP , encontraras estos documentos dentro del zip.
 ###### CONSULTAS.txt

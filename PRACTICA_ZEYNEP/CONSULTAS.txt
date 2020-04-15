@@ -1,0 +1,127 @@
+/*1 . Selecciona la zona con mayor consumo medio.
+
+SELECT ID AS ID_ZONA, CONSUMO_MEDIO,  TIPO, ID_PROVINCIA
+FROM ZONAA
+WHERE CONSUMO_MEDIO=(SELECT MAX(CONSUMO_MEDIO) FROM ZONAA);
+
+
+/*2. Selecciona al productor que ha entragado mayor cantidad de energia en el mes de mayo del 2015.
+
+SELECT E.CANTIDAD, E.FECHA, E.ID_PRODUCTOR, P.NOMBRE
+   FROM ENTRAGAA E, PRODUCTORR P
+   WHERE CANTIDAD = (SELECT MAX(CANTIDAD) FROM ENTRAGAA
+   					  WHERE
+   					  FECHA BETWEEN DATE'2015-05-01' AND DATE'2015-05-31'
+                                          AND E.ID_PRODUCTOR = P.ID);
+
+/*3.  Determina las companias electricas que abastecen a la Provincia de Ceuta.
+
+SELECT DISTINCT C.ID AS "ID DE COMPANIA", C.NOMBRE AS "NOMBRE DE COMPANIA"
+   FROM PROVINCIAA P, ZONAA Z, ATENDERR A, SUBESTACIONN S, COMPARTIDAA CT, COMPANIAA C
+   WHERE P.NOMBRE = 'CEUTA' AND Z.ID_PROVINCIA = P.ID
+   AND  A.ID_ZONA = Z.ID  AND  S.ID = A.ID_SUB
+   AND  CT.ID_RED = S.ID_RED AND CT.ID_COMPANIA = C.ID;
+
+
+
+/*4. Realiza un listado con todos las redes, su estacion cabecera y la cantidad total de energia recibida por esta estacion.
+
+SELECT R.ID AS ID_RED, E.ID_ESTACION AS "ESTACION CABECERA", SUM(NVL(E.CANTIDAD,0)) AS "TOTAL ENERGIA"
+FROM ENTRAGAA E, REDD R
+WHERE E.ID_ESTACION = R.ID_ESTACION
+GROUP BY R.ID, E.ID_ESTACION;
+
+
+
+
+
+
+
+
+
+/*5. Determina los productores solares que entregan energia a todas las estaciones primarias existentes.
+
+SELECT P.NOMBRE, S.ID FROM SOLARR S, PRODUCTORR P
+WHERE NOT EXISTS (SELECT *FROM ESTACIONN E
+                  WHERE NOT EXISTS(SELECT *FROM ENTRAGAA A
+                        WHERE A.ID_PRODUCTOR=S.ID AND
+                        E.ID = A.ID_ESTACION 
+                        )
+) AND S.ID = P.ID;
+
+
+/*6. Realiza un listado con las compras acumuladas realizadas por centrales nucleares  en el mes de mayo de 2015 ordenados de mayor a menor total acumulado. Los datos a mostrar seran: Nombre de Productor, Cantidad acumulada en el mes.
+
+SELECT P.NOMBRE AS "NOMBRE DE PRODUCTOR", SUM(C.CANTIDAD) AS "CANTIDAD ACUMULADA"
+FROM PRODUCTORR P, NUCLEARR N, COMPRAA C
+WHERE P.ID=N.ID AND C.ID_NUCLEAR= N.ID AND C.FECHA BETWEEN DATE'2015-05-01' AND DATE'2015-05-31'
+GROUP BY P.NOMBRE
+ORDER BY "CANTIDAD ACUMULADA" DESC;
+
+
+/*.7. Realiza un listado de los intercambios de energia entre redes mostrando el total enviado, recibido y la diferencia entre ambos cada red.
+
+SELECT ID_RED_TOMAR, ID_RED_DAR, ENERGIA_TRANSMITIDA
+FROM ENVIAR_SOBRENTEE ;
+
+/*8. Realiza un listado de provincias con sus consumos medios ordenado por este valor, Los campos a mostrar seran: Nombre de Provincia, Consumo Medio.
+
+SELECT P.NOMBRE, SUM(Z.CONSUMO_MEDIO) AS CONSUMO_MEDIO
+FROM PROVINCIAA P
+LEFT JOIN ZONAA Z
+ON P.ID = Z.ID_PROVINCIA
+GROUP BY P.NOMBRE 
+ORDER BY CONSUMO_MEDIO ASC;
+
+
+
+/*9. Selecciona las subestaciones no abastecidad por ninguna linea.
+
+/*10. Realiza un listado con los suministradores que hayan efectuado mas de 2 ventas y la cantidad de material suministrada supere los 1000 kg. Los campos a mostrar seran: Nombre, N de ventas, Cantidad Total.
+
+SELECT S.NOMBRE, COUNT(*) AS VENTAS, SUM(C.CANTIDAD) AS CANTIDAD_TOTAL
+FROM SUMINISTRADORR S, COMPRAA C
+WHERE C.COMPRA_ID = S.ID 
+GROUP BY S.NOMBRE
+HAVING COUNT(C.COMPRA_ID)>=2 AND SUM(C.CANTIDAD)>=1000;
+
+
+
+
+/*11.  Crear una vista que muestre los consumos acumulados por provincia. Los campos a mostran seran: Codigo de provincia, consumo medio de la provincia.
+
+CREATE VIEW CONSUMO_PROVINCIA
+(NOMBRE_PROVINCIA, CONSUMO_MEDIO)
+AS
+(SELECT P.NOMBRE AS NOMBRE_PROVINCIA, SUM(Z.CONSUMO_MEDIO) AS CONSUMO_MEDIO
+FROM PROVINCIAA P
+LEFT JOIN ZONAA Z
+ON P.ID = Z.ID_PROVINCIA
+GROUP BY P.NOMBRE 
+);
+
+
+/*12. Crear una vista que muestre la cantidad entregada de los productores por meses ordenado por Productor y Mes. Los campos a mostrar seran: Nombre de Productor, Mes, Cantidad.
+
+CREATE VIEW CANTIDAD_ENTREGADA
+(NOMBRE_PRODUCTOR, MES, CANTIDAD_TOTAL)
+AS
+ (SELECT P.NOMBRE AS NOMBRE_PRODUCTOR, EXTRACT(MONTH FROM E.FECHA) AS MES, SUM(E.CANTIDAD) AS CANTIDAD_TOTAL
+FROM PRODUCTORR P
+LEFT JOIN ENTRAGAA E
+ON E.ID_PRODUCTOR = P.ID
+GROUP BY P.NOMBRE, EXTRACT(MONTH FROM E.FECHA) );
+
+
+/*13.  Crear un indice sobre la tabla zona para mejorar la eficencia de consulta de esta tabla al acceder a traves del codigo de provincia.
+
+CREATE INDEX INDEX_ZONA_ID_PROVINCIA ON ZONAA(ID_PROVINCIA);
+
+
+/*14. Crear un indice que mejore la eficiencia de las consultas de compras por codigo de productor nuclear.
+
+CREATE INDEX INDEX_COMPRA_ID_NUCLEAR ON COMPRAA(ID_NUCLEAR);
+
+
+
+

@@ -15,7 +15,7 @@
 ###### PRACTICA_ZEYNEP.pdf
 
 # ELEKTRİK ENERJİ SİSTEMİ
-#### Merhaba, bu proje için adım adım elektrik enerji sistemi yaptım
+#### Merhaba, bu projede adım adım bir elektrik enerji sistemi yaptım
 #### Lütfen PRACTICA_ZEYNEP zip dosyasını yükleyin, bu belgeleri zip içinde bulacaksınız.
 ###### CONSULTAS.txt
 ###### CREACION_TABLAS.txt
